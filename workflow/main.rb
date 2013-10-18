@@ -8,7 +8,7 @@
 require 'rubygems' unless defined? Gem # rubygems is only needed in 1.8
 require 'bundle/bundler/setup'
 require 'alfred'
-require 'net/http'
+require 'net/https'
 require 'JSON'
 
 def url_from_query query
@@ -21,7 +21,11 @@ end
 
 def fetch_datasets url
   uri = URI(url)
-  results = Net::HTTP.get(uri)
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+  request = Net::HTTP::Get.new(uri.request_uri)
+  results = http.request(request).body
   JSON.parse(results)
 end
 
